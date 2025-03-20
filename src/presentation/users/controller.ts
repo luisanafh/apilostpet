@@ -5,6 +5,8 @@ import { loginUsersService } from './services/login-user.service';
 import { FinderUserService } from './services/finder-user.service';
 import { UpdateUserService } from './services/updater-user.service';
 import { DeleteUserService } from './services/eliminator-user.service';
+import { CreateUserDto } from '../../domain/dtos/users/create-user.dto';
+import { UpdateUserDto } from '../../domain/dtos/users/update-user.dto';
 
 export class UserController {
   constructor(
@@ -20,9 +22,13 @@ export class UserController {
     this.finderUsers.execute().then((users) => res.status(200).json(users));
   };
   register = (req: Request, res: Response) => {
-    const userData = req.body;
+    const [error, createUserDto] = CreateUserDto.execute(req.body);
+
+    if (error) {
+      return res.status(422).json({ message: error });
+    }
     this.registerUser
-      .execute(userData)
+      .execute(createUserDto!)
       .then((user) => res.status(201).json(user))
       .catch((error) => res.status(500).json({ message: error.message }));
   };
@@ -38,8 +44,14 @@ export class UserController {
   };
   update = (req: Request, res: Response) => {
     const { id } = req.params;
+    const [error, updateUserDto] = UpdateUserDto.execute(req.body);
+
+    if (error) {
+      return res.status(422).json({ message: error });
+    }
+
     this.updateUser
-      .execute(id, req.body)
+      .execute(id, updateUserDto!)
       .then((user) => res.status(200).json(user))
       .catch((err) => res.status(500).json({ message: err.message }));
   };

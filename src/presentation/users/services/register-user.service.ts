@@ -1,7 +1,8 @@
 import { User } from '../../../data/postgres/models/user.model';
+import { CreateUserDto } from '../../../domain/dtos/users/create-user.dto';
 
 export class RegisterUserService {
-  async execute(userData: any) {
+  async execute(userData: CreateUserDto) {
     const user = new User();
 
     user.name = userData.name;

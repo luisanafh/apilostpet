@@ -1,14 +1,15 @@
 import { User } from '../../../data/postgres/models/user.model';
 import { UserStatus } from '../../../data/postgres/models/user.model';
+import { UpdateUserDto } from '../../../domain/dtos/users/update-user.dto';
 
 export class UpdateUserService {
-  async execute(userId: string, userData: any) {
+  async execute(userId: string, userData: UpdateUserDto) {
     const user = await this.ensureUserExists(userId);
     user.name = userData.name || user.name;
     user.email = userData.email || user.email;
 
     try {
-      const updatedUser = await user.save();
+      await user.save();
       return {
         message: 'User updated successfully',
       };

@@ -5,7 +5,7 @@ export class FinderUserService {
   async execute(id: string) {
     try {
       const user = await User.findOne({
-        select: ['id', 'name', 'email', 'role', 'status'],
+        select: ['id', 'name', 'email', 'role'],
         where: {
           id: id,
           status: UserStatus.ACTIVE,
