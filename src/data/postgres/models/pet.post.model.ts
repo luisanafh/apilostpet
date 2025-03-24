@@ -32,7 +32,7 @@ export class PetPost extends BaseEntity {
   @Column('text')
   description: string;
 
-  @Column('varchar', { length: 255, nullable: true })
+  @Column('varchar', { length: 255, nullable: false })
   image_url: string;
 
   @Column({

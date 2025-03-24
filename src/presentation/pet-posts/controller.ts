@@ -4,6 +4,8 @@ import { FinderPetPostsService } from './services/finder-pet-posts.service';
 import { UpdatePetPostService } from './services/updater-pet-post.service';
 import { FinderPetPostService } from './services/finder-pet-post.service';
 import { DeletePetPostService } from './services/eliminator-pet-post.service';
+import { CreatePetPostDto } from '../../domain/dtos/post-pet/create-post.dto';
+import { UpdatePetPostDto } from '../../domain/dtos/post-pet/update.post.dto';
 export class PostController {
   constructor(
     private readonly createPost: CreatePetPostService,
@@ -12,21 +14,19 @@ export class PostController {
     private readonly updatePost: UpdatePetPostService,
     private readonly deletePost: DeletePetPostService
   ) {}
-
   findAll = (req: Request, res: Response) => {
     this.finderPosts.execute().then((posts) => res.status(200).json(posts));
   };
   creator = (req: Request, res: Response) => {
-    const postData = req.body;
+    const [error, createPetPostDto] = CreatePetPostDto.execute(req.body);
 
+    if (error) {
+      return res.status(422).json({ message: error });
+    }
     this.createPost
-      .execute(postData)
-      .then((createdPost) => {
-        res.status(201).json(createdPost);
-      })
-      .catch((error) => {
-        res.status(500).json({ message: error.message });
-      });
+      .execute(createPetPostDto!)
+      .then((createPost) => res.status(201).json(createPost))
+      .catch((error) => res.status(500).json({ message: error.message }));
   };
   findOne = (req: Request, res: Response) => {
     const { id } = req.params;
@@ -37,11 +37,18 @@ export class PostController {
   };
   update = (req: Request, res: Response) => {
     const { id } = req.params;
+    const [error, updatePetPostDto] = UpdatePetPostDto.execute(req.body);
+
+    if (error) {
+      return res.status(422).json({ message: error });
+    }
+
     this.updatePost
-      .execute(id, req.body)
-      .then((post) => res.status(200).json(post))
+      .execute(id, updatePetPostDto!)
+      .then((user) => res.status(200).json(user))
       .catch((err) => res.status(500).json({ message: err.message }));
   };
+
   delete = (req: Request, res: Response) => {
     const { id } = req.params;
     this.deletePost
