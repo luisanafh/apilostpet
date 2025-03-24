@@ -1,5 +1,6 @@
 import { User } from '../../../data/postgres/models/user.model';
 import { UserStatus } from '../../../data/postgres/models/user.model';
+import { CustomError } from '../../../domain';
 
 export class FinderUsersService {
   async execute() {
@@ -11,7 +12,9 @@ export class FinderUsersService {
 
       return users;
     } catch (error) {
-      throw new Error('An error occurred while searching for users');
+      throw CustomError.internalServer(
+        'An error occurred while searching for users'
+      );
     }
   }
 }

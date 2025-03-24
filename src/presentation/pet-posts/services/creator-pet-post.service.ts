@@ -1,5 +1,6 @@
 import { PetPost } from '../../../data/postgres/models/pet.post.model';
 import { CreatePetPostDto } from '../../../domain/dtos/post-pet/create-post.dto';
+import { CustomError } from '../../../domain';
 
 export class CreatePetPostService {
   async execute(postData: CreatePetPostDto) {
@@ -14,7 +15,9 @@ export class CreatePetPostService {
       return petPostCreated;
     } catch (error) {
       console.error('Error creating pet post:', error);
-      throw new Error('An error occurred while creating the pet post');
+      throw CustomError.internalServer(
+        'An error occurred while creating the pet post'
+      );
     }
   }
 }

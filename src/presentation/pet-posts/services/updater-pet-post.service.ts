@@ -1,32 +1,36 @@
 import { PetPost } from '../../../data/postgres/models/pet.post.model';
+import { CustomError } from '../../../domain';
 
 export class UpdatePetPostService {
-  async execute(Id: string, postData: any) {
-    const post = await this.ensurePostExists(Id);
+  async execute(id: string, postData: any) {
+    const post = await this.ensurePostExists(id);
+
     post.pet_name = postData.pet_name || post.pet_name;
     post.description = postData.description || post.description;
     post.image_url = postData.image_url || post.image_url;
     post.isFound = postData.isFound || post.isFound;
 
     try {
-      const updatedPost = await post.save();
+      await post.save();
       return {
-        message: 'post updated successfully',
+        message: 'Post updated successfully',
       };
     } catch (error) {
-      throw new Error('An error occurred while updating the post');
+      throw CustomError.internalServer(
+        'An error occurred while updating the post'
+      );
     }
   }
 
-  private async ensurePostExists(Id: string): Promise<PetPost> {
+  private async ensurePostExists(id: string): Promise<PetPost> {
     const post = await PetPost.findOne({
       where: {
-        id: Id,
+        id: id,
       },
     });
 
     if (!post) {
-      throw new Error(`Post with id: ${Id} not found`);
+      throw CustomError.notFound(`Post with id ${id} not found`);
     }
 
     return post;

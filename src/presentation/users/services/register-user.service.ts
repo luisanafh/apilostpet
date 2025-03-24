@@ -1,5 +1,6 @@
 import { User } from '../../../data/postgres/models/user.model';
 import { CreateUserDto } from '../../../domain/dtos/users/create-user.dto';
+import { CustomError } from '../../../domain';
 
 export class RegisterUserService {
   async execute(userData: CreateUserDto) {
@@ -8,14 +9,14 @@ export class RegisterUserService {
     user.name = userData.name;
     user.email = userData.email;
     user.password = userData.password;
+
     try {
-      const UserCreated = await user.save();
-      return UserCreated;
+      const userCreated = await user.save();
+      return userCreated;
     } catch (error) {
-      throw new Error('An error occurred while registering the user');
+      throw CustomError.internalServer(
+        'An error occurred while registering the user'
+      );
     }
-    return {
-      message: 'User registered successfully',
-    };
   }
 }

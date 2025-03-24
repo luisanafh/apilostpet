@@ -2,6 +2,7 @@ import {
   PetPost,
   PetPostStatus,
 } from '../../../data/postgres/models/pet.post.model';
+import { CustomError } from '../../../domain';
 
 export class FinderPetPostsService {
   async execute() {
@@ -20,6 +21,7 @@ export class FinderPetPostsService {
         },
         where: { status: PetPostStatus.APPROVED },
       });
+
       const formattedPetPosts = petPosts.map((post) => ({
         ...post,
         user: post.user ? post.user.name : null,
@@ -27,7 +29,9 @@ export class FinderPetPostsService {
 
       return formattedPetPosts;
     } catch (error) {
-      throw new Error('An error occurred while searching for pet posts');
+      throw CustomError.internalServer(
+        'An error occurred while searching for pet posts'
+      );
     }
   }
 }

@@ -1,11 +1,13 @@
 import { Request, Response } from 'express';
-import { CreatePetPostService } from './services/creator-pet-post.service';
-import { FinderPetPostsService } from './services/finder-pet-posts.service';
-import { UpdatePetPostService } from './services/updater-pet-post.service';
-import { FinderPetPostService } from './services/finder-pet-post.service';
-import { DeletePetPostService } from './services/eliminator-pet-post.service';
-import { CreatePetPostDto } from '../../domain/dtos/post-pet/create-post.dto';
-import { UpdatePetPostDto } from '../../domain/dtos/post-pet/update.post.dto';
+import { CustomError, CreatePetPostDto, UpdatePetPostDto } from '../../domain';
+import {
+  CreatePetPostService,
+  FinderPetPostsService,
+  UpdatePetPostService,
+  FinderPetPostService,
+  DeletePetPostService,
+} from './services';
+
 export class PostController {
   constructor(
     private readonly createPost: CreatePetPostService,
@@ -14,9 +16,22 @@ export class PostController {
     private readonly updatePost: UpdatePetPostService,
     private readonly deletePost: DeletePetPostService
   ) {}
-  findAll = (req: Request, res: Response) => {
-    this.finderPosts.execute().then((posts) => res.status(200).json(posts));
+
+  private handleError = (error: unknown, res: Response) => {
+    if (error instanceof CustomError) {
+      return res.status(error.statusCode).json({ message: error.message });
+    }
+
+    console.error(error);
+    return res.status(500).json({ message: 'Something went very wrong' });
   };
+  findAll = (req: Request, res: Response) => {
+    this.finderPosts
+      .execute()
+      .then((posts) => res.status(200).json(posts))
+      .catch((err) => this.handleError(err, res));
+  };
+
   creator = (req: Request, res: Response) => {
     const [error, createPetPostDto] = CreatePetPostDto.execute(req.body);
 
@@ -26,14 +41,14 @@ export class PostController {
     this.createPost
       .execute(createPetPostDto!)
       .then((createPost) => res.status(201).json(createPost))
-      .catch((error) => res.status(500).json({ message: error.message }));
+      .catch((err) => this.handleError(err, res));
   };
   findOne = (req: Request, res: Response) => {
     const { id } = req.params;
     this.finderPost
       .execute(id)
       .then((post) => res.status(200).json(post))
-      .catch((err) => res.status(500).json({ message: err.message }));
+      .catch((err) => this.handleError(err, res));
   };
   update = (req: Request, res: Response) => {
     const { id } = req.params;
@@ -46,7 +61,7 @@ export class PostController {
     this.updatePost
       .execute(id, updatePetPostDto!)
       .then((user) => res.status(200).json(user))
-      .catch((err) => res.status(500).json({ message: err.message }));
+      .catch((err) => this.handleError(err, res));
   };
 
   delete = (req: Request, res: Response) => {
@@ -54,6 +69,6 @@ export class PostController {
     this.deletePost
       .execute(id)
       .then(() => res.status(204).json(null))
-      .catch((err) => res.status(500).json({ message: err.message }));
+      .catch((err) => this.handleError(err, res));
   };
 }

@@ -2,6 +2,7 @@ import {
   PetPost,
   PetPostStatus,
 } from '../../../data/postgres/models/pet.post.model';
+import { CustomError } from '../../../domain';
 
 export class FinderPetPostService {
   async execute(id: string) {
@@ -25,12 +26,17 @@ export class FinderPetPostService {
       });
 
       if (!post) {
-        throw new Error('Post not found');
+        throw CustomError.notFound('Post not found');
       }
 
       return post;
     } catch (error) {
-      throw new Error('An error occurred while searching for the post');
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      throw CustomError.internalServer(
+        'An error occurred while searching for the post'
+      );
     }
   }
 }

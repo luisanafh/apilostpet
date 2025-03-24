@@ -1,6 +1,7 @@
 import { User } from '../../../data/postgres/models/user.model';
 import { UserStatus } from '../../../data/postgres/models/user.model';
 import { UpdateUserDto } from '../../../domain/dtos/users/update-user.dto';
+import { CustomError } from '../../../domain';
 
 export class UpdateUserService {
   async execute(userId: string, userData: UpdateUserDto) {
@@ -14,7 +15,9 @@ export class UpdateUserService {
         message: 'User updated successfully',
       };
     } catch (error) {
-      throw new Error('An error occurred while updating the user');
+      throw CustomError.internalServer(
+        'An error occurred while updating the user'
+      );
     }
   }
 
@@ -27,7 +30,7 @@ export class UpdateUserService {
     });
 
     if (!user) {
-      throw new Error(`User with id: ${userId} not found`);
+      throw CustomError.notFound(`User with id ${userId} not found`);
     }
 
     return user;

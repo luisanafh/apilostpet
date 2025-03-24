@@ -2,32 +2,33 @@ import {
   PetPost,
   PetPostStatus,
 } from '../../../data/postgres/models/pet.post.model';
+import { CustomError } from '../../../domain';
 
 export class DeletePetPostService {
-  async execute(Id: string) {
-    const post = await this.ensureUserExists(Id);
+  async execute(id: string) {
+    const post = await this.ensurePostExists(id);
 
     post.status = PetPostStatus.REJECTED;
+
     try {
       await post.save();
+      return true;
     } catch (error) {
-      throw new Error('Error trying to delete post');
+      throw CustomError.internalServer('Error trying to delete post');
     }
-
-    return true;
   }
 
-  private async ensureUserExists(Id: string) {
+  private async ensurePostExists(id: string): Promise<PetPost> {
     const post = await PetPost.findOne({
       select: ['id'],
       where: {
-        id: Id,
+        id: id,
         status: PetPostStatus.APPROVED,
       },
     });
 
     if (!post) {
-      throw new Error(`post with id: ${Id} not found`);
+      throw CustomError.notFound(`Post with id ${id} not found`);
     }
 
     return post;

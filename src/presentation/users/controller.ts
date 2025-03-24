@@ -1,12 +1,13 @@
 import { Request, Response } from 'express';
-import { RegisterUserService } from './services/register-user.service';
-import { FinderUsersService } from './services/finder-users.service';
-import { loginUsersService } from './services/login-user.service';
-import { FinderUserService } from './services/finder-user.service';
-import { UpdateUserService } from './services/updater-user.service';
-import { DeleteUserService } from './services/eliminator-user.service';
-import { CreateUserDto } from '../../domain/dtos/users/create-user.dto';
-import { UpdateUserDto } from '../../domain/dtos/users/update-user.dto';
+import { CustomError, UpdateUserDto, CreateUserDto } from '../../domain';
+import {
+  DeleteUserService,
+  FinderUserService,
+  FinderUsersService,
+  RegisterUserService,
+  UpdateUserService,
+  loginUsersService,
+} from './services/index';
 
 export class UserController {
   constructor(
@@ -18,8 +19,19 @@ export class UserController {
     private readonly deleteUser: DeleteUserService
   ) {}
 
+  private handleError = (error: unknown, res: Response) => {
+    if (error instanceof CustomError) {
+      return res.status(error.statusCode).json({ message: error.message });
+    }
+
+    console.error(error);
+    return res.status(500).json({ message: 'Something went very wrong' });
+  };
   findAll = (req: Request, res: Response) => {
-    this.finderUsers.execute().then((users) => res.status(200).json(users));
+    this.finderUsers
+      .execute()
+      .then((users) => res.status(200).json(users))
+      .catch((err) => this.handleError(err, res));
   };
   register = (req: Request, res: Response) => {
     const [error, createUserDto] = CreateUserDto.execute(req.body);
@@ -30,14 +42,14 @@ export class UserController {
     this.registerUser
       .execute(createUserDto!)
       .then((user) => res.status(201).json(user))
-      .catch((error) => res.status(500).json({ message: error.message }));
+      .catch((err) => this.handleError(err, res));
   };
   findOne = (req: Request, res: Response) => {
     const { id } = req.params;
     this.finderUser
       .execute(id)
       .then((user) => res.status(200).json(user))
-      .catch((err) => res.status(500).json({ message: err.message }));
+      .catch((err) => this.handleError(err, res));
   };
   login = (req: Request, res: Response) => {
     this.loginUsers.execute(res);
@@ -53,13 +65,13 @@ export class UserController {
     this.updateUser
       .execute(id, updateUserDto!)
       .then((user) => res.status(200).json(user))
-      .catch((err) => res.status(500).json({ message: err.message }));
+      .catch((err) => this.handleError(err, res));
   };
   delete = (req: Request, res: Response) => {
     const { id } = req.params;
     this.deleteUser
       .execute(id)
       .then(() => res.status(204).json(null))
-      .catch((err) => res.status(500).json({ message: err.message }));
+      .catch((err) => this.handleError(err, res));
   };
 }
