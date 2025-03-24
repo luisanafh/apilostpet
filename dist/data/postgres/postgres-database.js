@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PostgresDatabase = void 0;
 const typeorm_1 = require("typeorm");
 const user_model_1 = require("./models/user.model");
-const pet_post_model_1 = require("./models/pet.post,model");
+const pet_post_model_1 = require("./models/pet.post.model");
 class PostgresDatabase {
     constructor(options) {
         this.datasource = new typeorm_1.DataSource({
@@ -22,18 +22,21 @@ class PostgresDatabase {
             username: options.username,
             password: options.password,
             database: options.database,
-            entities: [user_model_1.User, pet_post_model_1.PetPost],
             synchronize: true,
+            entities: [user_model_1.User, pet_post_model_1.PetPost],
+            ssl: {
+                rejectUnauthorized: false,
+            },
         });
     }
     connect() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 yield this.datasource.initialize();
-                console.log('Database connected');
+                console.log('Connected to database 😊');
             }
             catch (error) {
-                console.log(error);
+                console.error(error);
             }
         });
     }

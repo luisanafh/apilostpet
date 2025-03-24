@@ -13,7 +13,9 @@ export class CreateUserDto {
     if (!name) return ['name is required'];
     if (!password) return ['password is required'];
     if (!regularExp.password.test(password))
-      return ['format password is invalid'];
+      return [
+        'Password must be 8-16 characters long, contain at least one lowercase letter, one uppercase letter, and one special character',
+      ];
     if (!email) return ['email is required'];
     if (!regularExp.email.test(email)) return ['email is invalid'];
 

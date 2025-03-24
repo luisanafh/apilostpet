@@ -9,9 +9,20 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.User = void 0;
+exports.User = exports.UserStatus = exports.UserRole = void 0;
 const typeorm_1 = require("typeorm");
-let User = class User {
+const pet_post_model_1 = require("./pet.post.model");
+var UserRole;
+(function (UserRole) {
+    UserRole["ADMIN"] = "admin";
+    UserRole["USER"] = "user";
+})(UserRole || (exports.UserRole = UserRole = {}));
+var UserStatus;
+(function (UserStatus) {
+    UserStatus["ACTIVE"] = "active";
+    UserStatus["INACTIVE"] = "inactive";
+})(UserStatus || (exports.UserStatus = UserStatus = {}));
+let User = class User extends typeorm_1.BaseEntity {
 };
 exports.User = User;
 __decorate([
@@ -19,21 +30,50 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'varchar', length: 255 }),
+    (0, typeorm_1.Column)('varchar', {
+        length: 70,
+        nullable: false,
+    }),
     __metadata("design:type", String)
 ], User.prototype, "name", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'varchar', length: 255, unique: true }),
+    (0, typeorm_1.Column)('varchar', {
+        length: 255,
+        unique: true,
+        nullable: false,
+    }),
     __metadata("design:type", String)
 ], User.prototype, "email", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'varchar', length: 255 }),
+    (0, typeorm_1.Column)('varchar', {
+        length: 255,
+        nullable: false,
+    }),
     __metadata("design:type", String)
 ], User.prototype, "password", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ type: 'varchar', length: 50, default: 'user' }),
+    (0, typeorm_1.Column)('enum', { enum: UserRole, default: UserRole.USER, nullable: false }),
     __metadata("design:type", String)
 ], User.prototype, "role", void 0);
+__decorate([
+    (0, typeorm_1.Column)('enum', {
+        enum: UserStatus,
+        default: UserStatus.ACTIVE,
+        nullable: false,
+    }),
+    __metadata("design:type", String)
+], User.prototype, "status", void 0);
+__decorate([
+    (0, typeorm_1.Column)('timestamp', {
+        default: () => 'CURRENT_TIMESTAMP',
+        nullable: false,
+    }),
+    __metadata("design:type", Date)
+], User.prototype, "created_at", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => pet_post_model_1.PetPost, (petPost) => petPost.user),
+    __metadata("design:type", Array)
+], User.prototype, "petPosts", void 0);
 exports.User = User = __decorate([
     (0, typeorm_1.Entity)()
 ], User);

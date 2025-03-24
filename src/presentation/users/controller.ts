@@ -27,12 +27,14 @@ export class UserController {
     console.error(error);
     return res.status(500).json({ message: 'Something went very wrong' });
   };
+
   findAll = (req: Request, res: Response) => {
     this.finderUsers
       .execute()
       .then((users) => res.status(200).json(users))
       .catch((err) => this.handleError(err, res));
   };
+
   register = (req: Request, res: Response) => {
     const [error, createUserDto] = CreateUserDto.execute(req.body);
 

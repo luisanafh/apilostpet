@@ -1,11 +1,21 @@
 import { User } from '../../../data/postgres/models/user.model';
 import { CreateUserDto } from '../../../domain/dtos/users/create-user.dto';
 import { CustomError } from '../../../domain';
+import { regularExp } from '../../../config/reggex'; // Importar expresiones regulares
 
 export class RegisterUserService {
   async execute(userData: CreateUserDto) {
     const user = new User();
 
+    const emailExists = await User.findOne({
+      where: {
+        email: userData.email,
+      },
+    });
+
+    if (emailExists) {
+      throw CustomError.conflict('The email is already in use');
+    }
     user.name = userData.name;
     user.email = userData.email;
     user.password = userData.password;
@@ -14,6 +24,7 @@ export class RegisterUserService {
       const userCreated = await user.save();
       return userCreated;
     } catch (error) {
+      console.error('Error creating user:', error);
       throw CustomError.internalServer(
         'An error occurred while registering the user'
       );

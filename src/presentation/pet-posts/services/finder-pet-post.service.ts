@@ -1,3 +1,4 @@
+import { regularExp } from '../../../config/reggex';
 import {
   PetPost,
   PetPostStatus,
@@ -6,6 +7,8 @@ import { CustomError } from '../../../domain';
 
 export class FinderPetPostService {
   async execute(id: string) {
+    this.validateId(id);
+
     try {
       const post = await PetPost.findOne({
         relations: ['user'],
@@ -37,6 +40,12 @@ export class FinderPetPostService {
       throw CustomError.internalServer(
         'An error occurred while searching for the post'
       );
+    }
+  }
+
+  private validateId(id: string): void {
+    if (!regularExp.uuid.test(id)) {
+      throw CustomError.badRequest('Invalid ID format');
     }
   }
 }

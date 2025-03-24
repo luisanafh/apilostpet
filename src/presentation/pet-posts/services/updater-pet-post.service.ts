@@ -1,8 +1,11 @@
+import { regularExp } from '../../../config/reggex';
 import { PetPost } from '../../../data/postgres/models/pet.post.model';
 import { CustomError } from '../../../domain';
 
 export class UpdatePetPostService {
   async execute(id: string, postData: any) {
+    this.validateId(id);
+
     const post = await this.ensurePostExists(id);
 
     post.pet_name = postData.pet_name || post.pet_name;
@@ -34,5 +37,11 @@ export class UpdatePetPostService {
     }
 
     return post;
+  }
+
+  private validateId(id: string): void {
+    if (!regularExp.uuid.test(id)) {
+      throw CustomError.badRequest('Invalid ID format');
+    }
   }
 }

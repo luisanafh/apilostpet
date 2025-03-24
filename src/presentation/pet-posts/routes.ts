@@ -28,7 +28,7 @@ export class PetPostRoutes {
 
     router.get('/:id', controller.findOne);
 
-    router.post('/creator', controller.creator);
+    router.post('/', controller.creator);
 
     router.patch('/:id', controller.update);
 

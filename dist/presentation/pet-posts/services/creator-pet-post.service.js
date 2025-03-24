@@ -10,11 +10,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreatePetPostService = void 0;
+const pet_post_model_1 = require("../../../data/postgres/models/pet.post.model");
+const domain_1 = require("../../../domain");
 class CreatePetPostService {
     execute(postData) {
         return __awaiter(this, void 0, void 0, function* () {
-            // Lógica para crear una publicación
-            return 'Pet post created successfully';
+            const petpost = new pet_post_model_1.PetPost();
+            petpost.pet_name = postData.pet_name;
+            petpost.description = postData.description;
+            petpost.image_url = postData.image_url;
+            try {
+                const petPostCreated = yield petpost.save();
+                return petPostCreated;
+            }
+            catch (error) {
+                console.error('Error creating pet post:', error);
+                throw domain_1.CustomError.internalServer('An error occurred while creating the pet post');
+            }
         });
     }
 }

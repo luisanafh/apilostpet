@@ -1,3 +1,4 @@
+import { regularExp } from '../../../config/reggex';
 import {
   PetPost,
   PetPostStatus,
@@ -6,6 +7,8 @@ import { CustomError } from '../../../domain';
 
 export class DeletePetPostService {
   async execute(id: string) {
+    this.validateId(id);
+
     const post = await this.ensurePostExists(id);
 
     post.status = PetPostStatus.REJECTED;
@@ -32,5 +35,11 @@ export class DeletePetPostService {
     }
 
     return post;
+  }
+
+  private validateId(id: string): void {
+    if (!regularExp.uuid.test(id)) {
+      throw CustomError.badRequest('Invalid ID format');
+    }
   }
 }
