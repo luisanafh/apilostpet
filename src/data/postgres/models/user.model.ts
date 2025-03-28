@@ -47,7 +47,7 @@ export class User extends BaseEntity {
 
   @Column('enum', {
     enum: UserStatus,
-    default: UserStatus.ACTIVE,
+    default: UserStatus.INACTIVE,
     nullable: false,
   })
   status: UserStatus;

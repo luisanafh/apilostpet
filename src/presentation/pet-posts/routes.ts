@@ -5,6 +5,8 @@ import { FinderPetPostsService } from './services/finder-pet-posts.service';
 import { FinderPetPostService } from './services/finder-pet-post.service';
 import { UpdatePetPostService } from './services/updater-pet-post.service';
 import { DeletePetPostService } from './services/eliminator-pet-post.service';
+import { AuthMiddleware } from '../common/middlewares/auth.middleware';
+import { UserRole } from '../../data';
 
 export class PetPostRoutes {
   static get routes(): Router {
@@ -26,13 +28,16 @@ export class PetPostRoutes {
 
     router.get('/', controller.findAll);
 
+    router.use(AuthMiddleware.protect);
     router.get('/:id', controller.findOne);
-
     router.post('/', controller.creator);
-
     router.patch('/:id', controller.update);
 
-    router.delete('/:id', controller.delete);
+    router.delete(
+      '/:id',
+      AuthMiddleware.restrictTo(UserRole.ADMIN),
+      controller.delete
+    );
 
     return router;
   }
