@@ -30,9 +30,7 @@ export class UserController {
     if (error instanceof CustomError) {
       return res.status(error.statusCode).json({ message: error.message });
     }
-
-    console.error(error);
-    return res.status(500).json({ message: 'Something went very wrong🧨' });
+    return res.status(500).json({ message: 'Something went very wrong' });
   };
 
   findAll = (req: Request, res: Response) => {
