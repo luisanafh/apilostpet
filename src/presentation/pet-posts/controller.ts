@@ -32,16 +32,27 @@ export class PostController {
       .catch((err) => this.handleError(err, res));
   };
 
-  creator = (req: Request, res: Response) => {
-    const [error, createPetPostDto] = CreatePetPostDto.execute(req.body);
+  creator = async (req: Request, res: Response) => {
+    try {
+      const [error, createPetPostDto] = CreatePetPostDto.execute(req.body);
+      if (error) throw CustomError.badRequest(error);
 
-    if (error) {
-      return res.status(422).json({ message: error });
+      const userId = req.body.sessionUser?.id;
+      if (!userId) throw CustomError.unAutorized('Authentication required');
+
+      const createdPost = await this.createPost.execute(
+        createPetPostDto!,
+        userId
+      );
+
+      res.status(201).json({
+        status: 'success',
+        data: createdPost,
+        message: 'Post created successfully',
+      });
+    } catch (err) {
+      this.handleError(err, res);
     }
-    this.createPost
-      .execute(createPetPostDto!)
-      .then((createPost) => res.status(201).json(createPost))
-      .catch((err) => this.handleError(err, res));
   };
   findOne = (req: Request, res: Response) => {
     const { id } = req.params;

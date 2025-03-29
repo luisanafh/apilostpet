@@ -7,6 +7,7 @@ import { UpdatePetPostService } from './services/updater-pet-post.service';
 import { DeletePetPostService } from './services/eliminator-pet-post.service';
 import { AuthMiddleware } from '../common/middlewares/auth.middleware';
 import { UserRole } from '../../data';
+import { PostOwnershipMiddleware } from '../common/middlewares/restricpost.middleware';
 
 export class PetPostRoutes {
   static get routes(): Router {
@@ -31,11 +32,15 @@ export class PetPostRoutes {
     router.use(AuthMiddleware.protect);
     router.get('/:id', controller.findOne);
     router.post('/', controller.creator);
-    router.patch('/:id', controller.update);
+    router.patch(
+      '/:id',
+      PostOwnershipMiddleware.restrictPostOwnerOrAdmin(),
+      controller.update
+    );
 
     router.delete(
       '/:id',
-      AuthMiddleware.restrictTo(UserRole.ADMIN),
+      PostOwnershipMiddleware.restrictPostOwnerOrAdmin(),
       controller.delete
     );
 
