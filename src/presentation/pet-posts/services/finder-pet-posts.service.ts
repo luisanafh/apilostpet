@@ -16,18 +16,17 @@ export class FinderPetPostsService {
           image_url: true,
           isFound: true,
           user: {
+            id: true,
             name: true,
+            email: true,
           },
         },
         where: { status: PetPostStatus.APPROVED },
       });
 
-      const formattedPetPosts = petPosts.map((post) => ({
-        ...post,
-        user: post.user ? post.user.name : null,
-      }));
-
-      return formattedPetPosts;
+      return {
+        ...petPosts,
+      };
     } catch (error) {
       throw CustomError.internalServer(
         'An error occurred while searching for pet posts'

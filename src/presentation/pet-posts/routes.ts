@@ -1,13 +1,17 @@
 import { Router } from 'express';
 import { PostController } from './controller';
-import { CreatePetPostService } from './services/creator-pet-post.service';
-import { FinderPetPostsService } from './services/finder-pet-posts.service';
-import { FinderPetPostService } from './services/finder-pet-post.service';
-import { UpdatePetPostService } from './services/updater-pet-post.service';
-import { DeletePetPostService } from './services/eliminator-pet-post.service';
-import { AuthMiddleware } from '../common/middlewares/auth.middleware';
+import {
+  CreatePetPostService,
+  FinderPetPostsService,
+  UpdatePetPostService,
+  FinderPetPostService,
+  DeletePetPostService,
+  RejectPetPostService,
+  ApprovePetPostService,
+} from './services';
 import { UserRole } from '../../data';
 import { PostOwnershipMiddleware } from '../common/middlewares/restricpost.middleware';
+import { AuthMiddleware } from '../common/middlewares/auth.middleware';
 
 export class PetPostRoutes {
   static get routes(): Router {
@@ -16,13 +20,17 @@ export class PetPostRoutes {
     const finderPost = new FinderPetPostService();
     const updatePost = new UpdatePetPostService();
     const deletePost = new DeletePetPostService();
+    const approvedPost = new ApprovePetPostService();
+    const rejectPost = new RejectPetPostService();
 
     const controller = new PostController(
       creatorPost,
       finderPosts,
       finderPost,
       updatePost,
-      deletePost
+      deletePost,
+      approvedPost,
+      rejectPost
     );
 
     const router = Router();
@@ -43,7 +51,17 @@ export class PetPostRoutes {
       AuthMiddleware.restrictTo(UserRole.ADMIN),
       controller.delete
     );
+    router.patch(
+      '/:id/approve',
+      AuthMiddleware.restrictTo(UserRole.ADMIN),
+      controller.approve
+    );
 
+    router.patch(
+      '/:id/reject',
+      AuthMiddleware.restrictTo(UserRole.ADMIN),
+      controller.reject
+    );
     return router;
   }
 }

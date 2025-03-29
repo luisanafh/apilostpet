@@ -38,7 +38,7 @@ export class PetPost extends BaseEntity {
   @Column({
     type: 'enum',
     enum: PetPostStatus,
-    default: PetPostStatus.APPROVED,
+    default: PetPostStatus.PENDING,
   })
   status: PetPostStatus;
 

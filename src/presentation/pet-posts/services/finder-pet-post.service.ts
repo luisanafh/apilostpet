@@ -12,6 +12,10 @@ export class FinderPetPostService {
     try {
       const post = await PetPost.findOne({
         relations: ['user'],
+        where: {
+          id: id,
+          status: PetPostStatus.APPROVED,
+        },
         select: {
           id: true,
           pet_name: true,
@@ -19,12 +23,10 @@ export class FinderPetPostService {
           image_url: true,
           isFound: true,
           user: {
+            id: true,
             name: true,
+            email: true,
           },
-        },
-        where: {
-          id: id,
-          status: PetPostStatus.APPROVED,
         },
       });
 
@@ -32,7 +34,9 @@ export class FinderPetPostService {
         throw CustomError.notFound('Post not found');
       }
 
-      return post;
+      return {
+        ...post,
+      };
     } catch (error) {
       if (error instanceof CustomError) {
         throw error;

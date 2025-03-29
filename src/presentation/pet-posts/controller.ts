@@ -6,6 +6,8 @@ import {
   UpdatePetPostService,
   FinderPetPostService,
   DeletePetPostService,
+  ApprovePetPostService,
+  RejectPetPostService,
 } from './services';
 
 export class PostController {
@@ -14,7 +16,9 @@ export class PostController {
     private readonly finderPosts: FinderPetPostsService,
     private readonly finderPost: FinderPetPostService,
     private readonly updatePost: UpdatePetPostService,
-    private readonly deletePost: DeletePetPostService
+    private readonly deletePost: DeletePetPostService,
+    private readonly approvePost: ApprovePetPostService,
+    private readonly rejectPost: RejectPetPostService
   ) {}
 
   private handleError = (error: unknown, res: Response) => {
@@ -81,5 +85,35 @@ export class PostController {
       .execute(id)
       .then(() => res.status(204).json(null))
       .catch((err) => this.handleError(err, res));
+  };
+
+  approve = async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const result = await this.approvePost.execute(id);
+
+      res.status(200).json({
+        status: 'success',
+        data: result,
+        message: 'Post approved successfully',
+      });
+    } catch (err) {
+      this.handleError(err, res);
+    }
+  };
+
+  reject = async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const result = await this.rejectPost.execute(id);
+
+      res.status(200).json({
+        status: 'success',
+        data: result,
+        message: 'Post rejected successfully',
+      });
+    } catch (err) {
+      this.handleError(err, res);
+    }
   };
 }
