@@ -40,7 +40,7 @@ export class PetPostRoutes {
 
     router.delete(
       '/:id',
-      PostOwnershipMiddleware.restrictPostOwnerOrAdmin(),
+      AuthMiddleware.restrictTo(UserRole.ADMIN),
       controller.delete
     );
 
